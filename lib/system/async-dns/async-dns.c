@@ -73,6 +73,7 @@ lws_async_dns_drop_server(struct lws_context *context)
 	context->async_dns.dns_server_set = 0;
 	lws_set_timeout(context->async_dns.wsi, 1, LWS_TO_KILL_ASYNC);
 	context->async_dns.wsi = NULL;
+	context->async_dns.dns_server_connected = 0;
 }
 
 int
@@ -126,7 +127,8 @@ lws_async_dns_sul_cb_retry(struct lws_sorted_usec_list *sul)
 	lwsl_info("%s\n", __func__);
 	lws_adns_dump(q->dns);
 
-	lws_callback_on_writable(q->dns->wsi);
+	if (q->dns && q->dns->wsi)
+		lws_callback_on_writable(q->dns->wsi);
 }
 
 static void
@@ -530,6 +532,16 @@ lws_async_dns_deinit(lws_async_dns_t *dns)
 {
 	lws_dll2_foreach_safe(&dns->waiting, NULL, clean);
 	lws_dll2_foreach_safe(&dns->cached, NULL, cache_clean);
+
+	if (dns->wsi && !dns->dns_server_connected) {
+		lwsl_notice("%s: late free of incomplete dns wsi\n", __func__);
+		__lws_lc_untag(&dns->wsi->lc);
+#if defined(LWS_WITH_SYS_METRICS)
+		lws_metrics_tags_destroy(&dns->wsi->cal_conn.mtags_owner);
+#endif
+		lws_free_set_NULL(dns->wsi->udp);
+		lws_free_set_NULL(dns->wsi);
+	}
 }
 
 
