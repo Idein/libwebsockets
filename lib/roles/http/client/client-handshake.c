@@ -471,7 +471,7 @@ create_new_conn:
 	 * to whatever we decided to connect to
 	 */
 
-       lwsl_info("%s: %p: address %s:%u\n", __func__, wsi, ads, port);
+       lwsl_err("%s: %p: address %s:%u\n", __func__, wsi, ads, port);
 
        n = lws_getaddrinfo46(wsi, ads, &result);
 	memset(&sa46, 0, sizeof(sa46));
