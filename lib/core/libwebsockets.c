@@ -213,7 +213,7 @@ lws_set_socks(struct lws_vhost *vhost, const char *socks)
 		}
 	}
 
-	lwsl_info(" Socks %s:%u\n", vhost->socks_proxy_address,
+	lwsl_err(" Socks %s:%u\n", vhost->socks_proxy_address,
 			vhost->socks_proxy_port);
 
 	return 0;

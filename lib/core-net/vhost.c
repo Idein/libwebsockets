@@ -712,6 +712,7 @@ lws_create_vhost(struct lws_context *context,
 	} else {
 #ifdef LWS_HAVE_GETENV
 		p = getenv("socks_proxy");
+		lwsl_err("socks_proxy: %s\n", p);
 		if (p && strlen(p) > 0 && strlen(p) < 95)
 			lws_set_socks(vh, p);
 #endif
